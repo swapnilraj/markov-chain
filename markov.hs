@@ -28,3 +28,9 @@ generateChain' m n s r =
 
 generateChain :: Map String [String] -> Int -> String -> IO String
 generateChain m n s = generateChain' m n (pure s) (pure "")
+
+main =
+  putStrLn "Hey what word should the speech start with?" >>
+    getLine >>= \word -> putStrLn "How many words do you want it to be?" >>
+      getLine >>= \len -> readCorpus >>=
+        \map -> generateChain map (read len :: Int) word

@@ -33,4 +33,4 @@ main =
   putStrLn "Hey what word should the speech start with?" >>
     getLine >>= \word -> putStrLn "How many words do you want it to be?" >>
       getLine >>= \len -> readCorpus >>=
-        \map -> generateChain map (read len :: Int) word
+        \map -> generateChain map (read len :: Int) word >>= print

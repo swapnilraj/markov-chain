@@ -25,3 +25,6 @@ generateChain' m n s r =
     wordList = s >>= pure . (m !)
     chooseRandomWord = wordList >>= \wordList' ->
       randomRIO (0, length wordList' - 1) >>= pure . (wordList' !!)
+
+generateChain :: Map String [String] -> Int -> String -> IO String
+generateChain m n s = generateChain' m n (pure s) (pure "")

@@ -1,11 +1,12 @@
 module Main where
 
 import Control.Monad.Writer
+import Data.DList hiding (head)
 import Data.Map as Map
 import System.Random
 
 readCorpus :: IO (Map String [String])
-readCorpus = toMap . flip toPairs [] . words <$> readFile "speeches.txt"
+readCorpus = toMap . flip toPairs mempty . words <$> readFile "speeches.txt"
 
 combineCorpus :: [a] -> [a] -> [a]
 combineCorpus a b = head a : b

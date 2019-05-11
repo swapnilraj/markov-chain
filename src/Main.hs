@@ -15,14 +15,14 @@ toMap :: Ord a => [(a, [a])] -> Map a [a]
 toMap = Map.fromListWith combineCorpus
 
 toPairs :: [a] -> [(a, [a])] -> [(a, [a])]
-toPairs (x:y:ys) acc = toPairs (y : ys) $ (,) x [y] : acc
-toPairs _ = id
+toPairs (x:y:ys) acc = toPairs (y : ys) $ (x, [y]) : acc
+toPairs _ acc = acc
 
-generateChain :: Map String [String] -> Int -> String -> WriterT [String] IO ()
-generateChain _ 0 s = tell [s]
+generateChain :: Map String [String] -> Int -> String -> WriterT (DList String) IO ()
+generateChain _ 0 s = tell $ pure s
 generateChain m n s =
   do
-    tell [s]
+    tell $ pure s
     randomWord <- lift chooseRandomWord
     generateChain m (pred n) randomWord
   where
@@ -35,5 +35,5 @@ main = do
   word <- getLine
   print "How many words?"
   len <- getLine
-  sentence <- execWriterT (generateChain map (read len) word)
+  sentence <- execWriterT $ generateChain map (read len) word
   print sentence

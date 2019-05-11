@@ -22,7 +22,8 @@ executable markov-chain-speech-gen
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13
-                       , containers
                        , random
+                       , mtl
+                       , containers
   hs-source-dirs:      src
   default-language:    Haskell2010

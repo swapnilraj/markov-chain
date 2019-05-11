@@ -1,5 +1,6 @@
 module Main where
 
+import Control.Monad.Writer
 import Data.Map as Map
 import System.Random
 
@@ -14,22 +15,24 @@ toMap = Map.fromListWith combineCorpus
 
 toPairs :: [a] -> [(a, [a])] -> [(a, [a])]
 toPairs (x:y:ys) acc = toPairs (y : ys) $ (,) x [y] : acc
-toPairs _ acc = acc
+toPairs _ = id
 
-generateChain' :: Map String [String] -> Int -> String -> String -> String
-generateChain' _ 0 _ r = r
-generateChain' m n s r =
-    generateChain' m (n-1) (chooseRandomWord) $ r ++ " " ++ s
+generateChain :: Map String [String] -> Int -> String -> WriterT [String] IO ()
+generateChain _ 0 s = tell [s]
+generateChain m n s =
+  do
+    tell [s]
+    randomWord <- lift chooseRandomWord
+    generateChain m (pred n) randomWord
   where
-    wordList = s >>= pure . (m !)
-    chooseRandomWord = wordList >>= \wordList' ->
-      randomRIO (0, length wordList' - 1) >>= (wordList' !!)
+    wordList = m ! s
+    chooseRandomWord = (wordList !!) <$> randomRIO (0, pred $ length wordList)
 
-generateChain :: Map String [String] -> Int -> String -> String
-generateChain m n s = generateChain' m n s mempty
-
-main =
-  putStrLn "Hey what word should the speech start with?" >>
-    getLine >>= \word -> putStrLn "How many words do you want it to be?" >>
-      getLine >>= \len -> readCorpus >>=
-        \map -> generateChain map (read len) word >>= print
+main = do
+  map <- readCorpus
+  print "Hey what word?"
+  word <- getLine
+  print "How many words?"
+  len <- getLine
+  sentence <- execWriterT (generateChain map (read len) word)
+  print sentence
